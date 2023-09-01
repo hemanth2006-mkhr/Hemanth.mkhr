@@ -1,91 +1,116 @@
-from ._anvil_designer import Form1Template
-from anvil import *
+# Tic-Tac-Toe game in python
 
-class Form1(Form1Template):
-  def __init__(self, **properties):
-    # Set Form properties and Data Bindings.
-    self.init_components(**properties)
+# Define the board as a list of 9 elements
+board = [" ", " ", " ",
+         " ", " ", " ",
+         " ", " ", " "]
 
-    # Any code you write here will run before the form opens.
-# Import tkinter module for GUI
-import tkinter as tk
+# Define the symbols for the players
+X = "X"
+O = "O"
 
-# Create a window object
-window = tk.Tk()
-window.title("Calculator App")
+# Define a function to display the board
+def display_board():
+    print(board[0] + "|" + board[1] + "|" + board[2])
+    print("-+-+-")
+    print(board[3] + "|" + board[4] + "|" + board[5])
+    print("-+-+-")
+    print(board[6] + "|" + board[7] + "|" + board[8])
 
-# Create a global variable to store the expression
-expression = ""
+# Define a function to check if the board is full
+def is_full():
+    return " " not in board
 
-# Define a function to update the expression
-def update_expression(num):
-    global expression
-    expression = expression + str(num)
-    equation.set(expression)
+# Define a function to check if a player has won
+def has_won(symbol):
+    # Check horizontal lines
+    if board[0] == board[1] == board[2] == symbol:
+        return True
+    if board[3] == board[4] == board[5] == symbol:
+        return True
+    if board[6] == board[7] == board[8] == symbol:
+        return True
+    # Check vertical lines
+    if board[0] == board[3] == board[6] == symbol:
+        return True
+    if board[1] == board[4] == board[7] == symbol:
+        return True
+    if board[2] == board[5] == board[8] == symbol:
+        return True
+    # Check diagonal lines
+    if board[0] == board[4] == board[8] == symbol:
+        return True
+    if board[2] == board[4] == board[6] == symbol:
+        return True
+    # No winner
+    return False
 
-# Define a function to evaluate the expression
-def evaluate_expression():
-    global expression
-    try:
-        result = str(eval(expression))
-        equation.set(result)
-        expression = ""
-    except:
-        equation.set("Error")
-        expression = ""
+# Define a function to get the valid moves from the board
+def get_valid_moves():
+    moves = []
+    for i in range(len(board)):
+        if board[i] == " ":
+            moves.append(i)
+    return moves
 
-# Define a function to clear the expression
-def clear_expression():
-    global expression
-    expression = ""
-    equation.set("")
+# Define a function to get the user's move
+def get_user_move(symbol):
+    valid_moves = get_valid_moves()
+    while True:
+        try:
+            move = int(input(f"Enter your move for {symbol} (0-8): "))
+            if move in valid_moves:
+                return move
+            else:
+                print("Invalid move. Try again.")
+        except ValueError:
+            print("Invalid input. Try again.")
 
-# Create a string variable to display the equation
-equation = tk.StringVar()
-equation.set("")
+# Define a function to get the computer's move using a random choice
+import random
 
-# Create a label to show the equation
-equation_label = tk.Label(window, textvariable=equation)
-equation_label.grid(row=0, column=0, columnspan=4, padx=10, pady=10)
+def get_computer_move(symbol):
+    valid_moves = get_valid_moves()
+    move = random.choice(valid_moves)
+    print(f"Computer's move for {symbol} is {move}")
+    return move
 
-# Create buttons for digits and operators
-button_1 = tk.Button(window, text="1", command=lambda: update_expression(1))
-button_2 = tk.Button(window, text="2", command=lambda: update_expression(2))
-button_3 = tk.Button(window, text="3", command=lambda: update_expression(3))
-button_4 = tk.Button(window, text="4", command=lambda: update_expression(4))
-button_5 = tk.Button(window, text="5", command=lambda: update_expression(5))
-button_6 = tk.Button(window, text="6", command=lambda: update_expression(6))
-button_7 = tk.Button(window, text="7", command=lambda: update_expression(7))
-button_8 = tk.Button(window, text="8", command=lambda: update_expression(8))
-button_9 = tk.Button(window, text="9", command=lambda: update_expression(9))
-button_0 = tk.Button(window, text="0", command=lambda: update_expression(0))
-button_plus = tk.Button(window, text="+", command=lambda: update_expression("+"))
-button_minus = tk.Button(window, text="-", command=lambda: update_expression("-"))
-button_multiply = tk.Button(window, text="*", command=lambda: update_expression("*"))
-button_divide = tk.Button(window, text="/", command=lambda: update_expression("/"))
-button_equal = tk.Button(window, text="=", command=evaluate_expression)
-button_clear = tk.Button(window, text="C", command=clear_expression)
+# Define a function to play the game
+def play_game():
+    # Display the initial board
+    display_board()
 
-# Arrange the buttons in a grid layout
-button_1.grid(row=1, column=0)
-button_2.grid(row=1, column=1)
-button_3.grid(row=1, column=2)
-button_plus.grid(row=1, column=3)
+    # Loop until the game is over
+    while True:
+        # Get the user's move for X and update the board
+        user_move = get_user_move(X)
+        board[user_move] = X
 
-button_4.grid(row=2, column=0)
-button_5.grid(row=2, column=1)
-button_6.grid(row=2, column=2)
-button_minus.grid(row=2, column=3)
+        # Display the updated board
+        display_board()
 
-button_7.grid(row=3, column=0)
-button_8.grid(row=3, column=1)
-button_9.grid(row=3, column=2)
-button_multiply.grid(row=3, column=3)
+        # Check if the user has won or the board is full
+        if has_won(X):
+            print("You win!")
+            break
+        if is_full():
+            print("It's a tie!")
+            break
 
-button_clear.grid(row=4, column=0)
-button_0.grid(row=4, column=1)
-button_equal.grid(row=4, column=2)
-button_divide.grid(row=4, column=3)
+        # Get the computer's move for O and update the board
+        computer_move = get_computer_move(O)
+        board[computer_move] = O
 
-# Run the main loop of the window
-window.mainloop()
+        # Display the updated board
+        display_board()
+
+        # Check if the computer has won or the board is full
+        if has_won(O):
+            print("You lose!")
+            break
+        if is_full():
+            print("It's a tie!")
+            break
+
+# Start the game
+play_game()
